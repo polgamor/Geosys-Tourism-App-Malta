@@ -17,12 +17,12 @@ class _MapScreenState extends State<MapScreen> with AutomaticKeepAliveClientMixi
   int _currentIndex = 0;
   final PageController _pageController = PageController();
 
-  final List<Widget> _screens = [
-    const MapView(),
-    const FavoritePlacesScreen(),
-    const ItinerariesScreen(),
-    const EventsScreen(),
-    const ProfileScreen(),
+  final List<Widget> _screens = const [
+    MapView(),
+    FavoritePlacesScreen(),
+    ItinerariesScreen(),
+    EventsScreen(),
+    ProfileScreen(),
   ];
 
   @override
@@ -32,9 +32,7 @@ class _MapScreenState extends State<MapScreen> with AutomaticKeepAliveClientMixi
   }
 
   void _onTabTapped(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
+    setState(() => _currentIndex = index);
     _pageController.jumpToPage(index);
   }
 
@@ -44,11 +42,7 @@ class _MapScreenState extends State<MapScreen> with AutomaticKeepAliveClientMixi
     return Scaffold(
       body: PageView(
         controller: _pageController,
-        onPageChanged: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
+        onPageChanged: (index) => setState(() => _currentIndex = index),
         children: _screens,
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -64,27 +58,27 @@ class _MapScreenState extends State<MapScreen> with AutomaticKeepAliveClientMixi
           BottomNavigationBarItem(
             icon: Icon(Icons.map_outlined),
             activeIcon: Icon(Icons.map),
-            label: 'Mapa',
+            label: 'Map',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.favorite_border),
             activeIcon: Icon(Icons.favorite),
-            label: 'Favoritos',
+            label: 'Favourites',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.alt_route_outlined),
             activeIcon: Icon(Icons.alt_route),
-            label: 'Itinerarios',
+            label: 'Itineraries',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.event_outlined),
             activeIcon: Icon(Icons.event),
-            label: 'Eventos',
+            label: 'Events',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person_outline),
             activeIcon: Icon(Icons.person),
-            label: 'Perfil',
+            label: 'Profile',
           ),
         ],
       ),

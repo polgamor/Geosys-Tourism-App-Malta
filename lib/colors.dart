@@ -4,7 +4,7 @@ class AppColors {
   static const Color primary = Color(0xFF009929);
   static const Color primaryLight = Color(0xFF5CCB5F);
   static const Color accent = Color(0xFF006414);
-  static const Color background = Color(0xFF121212); // Un fondo oscuro para el tema
+  static const Color background = Color(0xFF121212);
   static const Color darkGrey = Color(0xFF666264);
   static const Color grey = Color(0xFF969595);
 

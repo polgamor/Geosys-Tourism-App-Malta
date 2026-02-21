@@ -74,7 +74,6 @@ class OnboardingScreen extends StatelessWidget {
                                 title: "A bit more about you",
                                 child: _buildDemographicsStep(viewModel),
                               ),
-                              // --- NUEVAS PÁGINAS ---
                               _OnboardingStep(
                                 icon: Icons.card_travel,
                                 title: "How do you travel?",
@@ -86,11 +85,10 @@ class OnboardingScreen extends StatelessWidget {
                                 title: "When are you visiting?",
                                 child: _buildTripDatesStep(context, viewModel),
                               ),
-                              // --- FIN DE NUEVAS PÁGINAS ---
                               _OnboardingStep(
                                 icon: Icons.interests_outlined,
                                 title: "What do you like?",
-                                subtitle: "Select your interests for personalized tips.",
+                                subtitle: "Select your interests for personalised tips.",
                                 child: _buildPreferencesStep(viewModel),
                               ),
                             ],
@@ -110,15 +108,13 @@ class OnboardingScreen extends StatelessWidget {
     );
   }
 
-  // --- WIDGETS DE LOS PASOS ---
-
   Widget _buildNameStep(OnboardingViewModel viewModel) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _buildTextField(hintText: "Name", controller: viewModel.nameController),
+        _buildTextField(hintText: 'Name', controller: viewModel.nameController),
         const SizedBox(height: 20),
-        _buildTextField(hintText: "Surname", controller: viewModel.surnameController),
+        _buildTextField(hintText: 'Surname', controller: viewModel.surnameController),
       ],
     );
   }
@@ -127,8 +123,8 @@ class OnboardingScreen extends StatelessWidget {
     return _buildPickerButton(
       context: context,
       value: viewModel.selectedCountry?.name,
-      hint: "Select your country",
-      icon: viewModel.selectedCountry != null 
+      hint: 'Select your country',
+      icon: viewModel.selectedCountry != null
           ? Text(viewModel.selectedCountry!.flagEmoji, style: const TextStyle(fontSize: 24))
           : null,
       onTap: () {
@@ -138,14 +134,17 @@ class OnboardingScreen extends StatelessWidget {
             backgroundColor: const Color(0xFF1E1E1E),
             textStyle: const TextStyle(color: Colors.white),
             inputDecoration: InputDecoration(
-              labelText: 'Search', hintText: 'Start typing to search',
+              labelText: 'Search',
+              hintText: 'Start typing to search',
               labelStyle: const TextStyle(color: Colors.white70),
               hintStyle: const TextStyle(color: Colors.white38),
               prefixIcon: const Icon(Icons.search, color: Colors.white70),
-              border: OutlineInputBorder(borderSide: BorderSide(color: Colors.white.withOpacity(0.2))),
+              border: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.white.withOpacity(0.2)),
+              ),
             ),
           ),
-          onSelect: (Country country) => viewModel.selectCountry(country),
+          onSelect: (country) => viewModel.selectCountry(country),
         );
       },
     );
@@ -156,10 +155,11 @@ class OnboardingScreen extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         _buildTextField(
-            hintText: "Age",
-            controller: viewModel.ageController,
-            keyboardType: TextInputType.number,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly]),
+          hintText: 'Age',
+          controller: viewModel.ageController,
+          keyboardType: TextInputType.number,
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+        ),
         const SizedBox(height: 20),
         Wrap(
           spacing: 12,
@@ -170,16 +170,18 @@ class OnboardingScreen extends StatelessWidget {
               selected: isSelected,
               onSelected: (_) => viewModel.selectGender(gender),
               backgroundColor: Colors.black.withOpacity(0.3),
-              labelStyle: TextStyle(color: isSelected ? Colors.black : Colors.white, fontWeight: FontWeight.bold),
+              labelStyle: TextStyle(
+                color: isSelected ? Colors.black : Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
               selectedColor: Colors.white,
             );
           }).toList(),
-        )
+        ),
       ],
     );
   }
 
-  // --- NUEVOS WIDGETS DE PASOS ---
   Widget _buildTravelStyleStep(OnboardingViewModel viewModel) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -195,7 +197,10 @@ class OnboardingScreen extends StatelessWidget {
               selected: isSelected,
               onSelected: (_) => viewModel.selectTravelStyle(style),
               backgroundColor: Colors.black.withOpacity(0.3),
-              labelStyle: TextStyle(color: isSelected ? Colors.black : Colors.white, fontWeight: FontWeight.bold),
+              labelStyle: TextStyle(
+                color: isSelected ? Colors.black : Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
               selectedColor: Colors.white,
             );
           }).toList(),
@@ -212,7 +217,10 @@ class OnboardingScreen extends StatelessWidget {
               selected: isSelected,
               onSelected: (_) => viewModel.selectBudgetTier(tier),
               backgroundColor: Colors.black.withOpacity(0.3),
-              labelStyle: TextStyle(color: isSelected ? Colors.black : Colors.white, fontWeight: FontWeight.bold),
+              labelStyle: TextStyle(
+                color: isSelected ? Colors.black : Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
               selectedColor: Colors.white,
             );
           }).toList(),
@@ -223,14 +231,15 @@ class OnboardingScreen extends StatelessWidget {
 
   Widget _buildTripDatesStep(BuildContext context, OnboardingViewModel viewModel) {
     final dateFormat = DateFormat('MMM d, yyyy');
-    final String buttonText = viewModel.tripStartDate != null && viewModel.tripEndDate != null
-      ? "${dateFormat.format(viewModel.tripStartDate!)} - ${dateFormat.format(viewModel.tripEndDate!)}"
-      : "Select your trip dates";
+    final String buttonText =
+        viewModel.tripStartDate != null && viewModel.tripEndDate != null
+            ? '${dateFormat.format(viewModel.tripStartDate!)} - ${dateFormat.format(viewModel.tripEndDate!)}'
+            : 'Select your trip dates';
 
     return _buildPickerButton(
       context: context,
       value: viewModel.tripStartDate != null ? buttonText : null,
-      hint: "Select your trip dates",
+      hint: 'Select your trip dates',
       onTap: () async {
         final dateRange = await showDateRangePicker(
           context: context,
@@ -244,7 +253,10 @@ class OnboardingScreen extends StatelessWidget {
                   onPrimary: Colors.white,
                   surface: Color(0xFF1E1E1E),
                   onSurface: Colors.white,
-                ), dialogTheme: DialogThemeData(backgroundColor: const Color(0xFF121212)),
+                ),
+                dialogTheme: const DialogThemeData(
+                  backgroundColor: Color(0xFF121212),
+                ),
               ),
               child: child!,
             );
@@ -256,13 +268,14 @@ class OnboardingScreen extends StatelessWidget {
       },
     );
   }
-  // --- FIN DE NUEVOS WIDGETS ---
 
   Widget _buildPreferencesStep(OnboardingViewModel viewModel) {
     return Center(
       child: SingleChildScrollView(
         child: Wrap(
-          spacing: 12.0, runSpacing: 12.0, alignment: WrapAlignment.center,
+          spacing: 12.0,
+          runSpacing: 12.0,
+          alignment: WrapAlignment.center,
           children: viewModel.availablePreferences.map((preference) {
             final isSelected = viewModel.selectedPreferences.contains(preference);
             return FilterChip(
@@ -270,10 +283,15 @@ class OnboardingScreen extends StatelessWidget {
               selected: isSelected,
               onSelected: (_) => viewModel.togglePreference(preference),
               backgroundColor: Colors.black.withOpacity(0.3),
-              labelStyle: TextStyle(color: isSelected ? Colors.black : Colors.white, fontWeight: FontWeight.bold),
+              labelStyle: TextStyle(
+                color: isSelected ? Colors.black : Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
               selectedColor: Colors.white,
               checkmarkColor: Colors.black,
-              shape: StadiumBorder(side: BorderSide(color: isSelected ? Colors.white : Colors.white54)),
+              shape: StadiumBorder(
+                side: BorderSide(color: isSelected ? Colors.white : Colors.white54),
+              ),
             );
           }).toList(),
         ),
@@ -281,14 +299,17 @@ class OnboardingScreen extends StatelessWidget {
     );
   }
 
-  // --- WIDGETS REUTILIZABLES Y DE NAVEGACIÓN ---
   Widget _buildNavigationControls(BuildContext context, OnboardingViewModel viewModel) {
     return Column(
       children: [
         if (viewModel.errorMessage != null)
           Padding(
             padding: const EdgeInsets.only(bottom: 10),
-            child: Text(viewModel.errorMessage!, style: const TextStyle(color: Colors.redAccent, fontSize: 12), textAlign: TextAlign.center),
+            child: Text(
+              viewModel.errorMessage!,
+              style: const TextStyle(color: Colors.redAccent, fontSize: 12),
+              textAlign: TextAlign.center,
+            ),
           ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -316,26 +337,35 @@ class OnboardingScreen extends StatelessWidget {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
               ),
               child: viewModel.isLoading
-                  ? const SizedBox(height: 24, width: 24, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                  ? const SizedBox(
+                      height: 24,
+                      width: 24,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                    )
                   : Text(
-                      viewModel.currentPage < viewModel.totalPages - 1 ? "Next" : "Finish",
-                      style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                      viewModel.currentPage < viewModel.totalPages - 1 ? 'Next' : 'Finish',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
             ),
-            Opacity(
+            // Invisible spacer to keep the Next/Finish button centred
+            const Opacity(
               opacity: 0,
-              child: IconButton(onPressed: null, icon: const Icon(Icons.arrow_back)),
+              child: IconButton(onPressed: null, icon: Icon(Icons.arrow_back)),
             ),
           ],
         ),
         TextButton(
           onPressed: () => _navigateToMapScreen(context),
-          child: const Text("Skip for now", style: TextStyle(color: Colors.white70)),
+          child: const Text('Skip for now', style: TextStyle(color: Colors.white70)),
         ),
       ],
     );
   }
-  
+
   Widget _buildTextField({
     required String hintText,
     required TextEditingController controller,
@@ -352,14 +382,17 @@ class OnboardingScreen extends StatelessWidget {
         hintStyle: TextStyle(color: Colors.grey.shade400),
         filled: true,
         fillColor: Colors.white.withOpacity(0.1),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: Colors.white.withOpacity(0.2)),
         ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color.fromARGB(255, 29, 168, 64)),
+        focusedBorder: const OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(12)),
+          borderSide: BorderSide(color: Color.fromARGB(255, 29, 168, 64)),
         ),
         contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
       ),
@@ -402,10 +435,10 @@ class OnboardingScreen extends StatelessWidget {
   }
 }
 
-// --- WIDGETS AUXILIARES ---
 class _OnboardingHeader extends StatelessWidget {
   final int currentPage;
   final int totalPages;
+
   const _OnboardingHeader({required this.currentPage, required this.totalPages});
 
   @override
@@ -437,7 +470,12 @@ class _OnboardingStep extends StatelessWidget {
   final String? subtitle;
   final Widget child;
 
-  const _OnboardingStep({required this.icon, required this.title, this.subtitle, required this.child});
+  const _OnboardingStep({
+    required this.icon,
+    required this.title,
+    this.subtitle,
+    required this.child,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -446,10 +484,22 @@ class _OnboardingStep extends StatelessWidget {
         const Spacer(flex: 2),
         Icon(icon, size: 40, color: Colors.white.withOpacity(0.8)),
         const SizedBox(height: 20),
-        Text(title, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+        Text(
+          title,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         if (subtitle != null) ...[
           const SizedBox(height: 10),
-          Text(subtitle!, textAlign: TextAlign.center, style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 14)),
+          Text(
+            subtitle!,
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 14),
+          ),
         ],
         const SizedBox(height: 40),
         Padding(

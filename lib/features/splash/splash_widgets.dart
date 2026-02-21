@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 class AnimatedLogo extends StatelessWidget {
   final Animation<double> scaleAnimation;
 
-  const AnimatedLogo({
-    super.key,
-    required this.scaleAnimation,
-  });
+  const AnimatedLogo({super.key, required this.scaleAnimation});
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +38,7 @@ class FooterText extends StatelessWidget {
       bottom: MediaQuery.of(context).size.height * 0.05,
       left: 0,
       right: 0,
-      child: Center(
+      child: const Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -54,7 +51,7 @@ class FooterText extends StatelessWidget {
               ),
             ),
             Transform.translate(
-              offset: Offset(0.0, -2.0), 
+              offset: Offset(0.0, -2.0),
               child: Text(
                 'GeoSYS',
                 style: TextStyle(

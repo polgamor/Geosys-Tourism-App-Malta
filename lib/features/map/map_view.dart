@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:arcgis_maps/arcgis_maps.dart';
 import 'map_interactions.dart';
@@ -17,7 +18,7 @@ class _MapViewState extends State<MapView> with AutomaticKeepAliveClientMixin {
   final MapInteractions _interactions = MapInteractions();
   final MapLocation _location = MapLocation();
   final RouteService _routeService = RouteService();
-  
+
   bool _isLocationEnabled = false;
   bool _showRouteButtons = false;
   ArcGISPoint? _selectedDestination;
@@ -47,12 +48,16 @@ class _MapViewState extends State<MapView> with AutomaticKeepAliveClientMixin {
         ),
       );
       if (mounted) {
-        _interactions.setupMapInteractions(_mapViewController, context, _onDestinationSelected);
+        _interactions.setupMapInteractions(
+          _mapViewController,
+          context,
+          _onDestinationSelected,
+        );
         _location.setupLocation(_mapViewController);
         _routeService.setupRouteService(_mapViewController);
       }
     } catch (e) {
-      print('Error al cargar el WebMap: $e');
+      debugPrint('Failed to load WebMap: $e');
     }
   }
 
@@ -66,42 +71,42 @@ class _MapViewState extends State<MapView> with AutomaticKeepAliveClientMixin {
   Future<void> _toggleLocation() async {
     final success = await _location.toggleLocation();
     if (success) {
-      setState(() {
-        _isLocationEnabled = !_isLocationEnabled;
-      });
+      setState(() => _isLocationEnabled = !_isLocationEnabled);
     }
   }
 
-  Future<void> _centerOnLocation() async {
-    await _location.centerOnLocation();
-  }
+  Future<void> _centerOnLocation() async => _location.centerOnLocation();
 
   Future<void> _zoomIn() async {
-    await _mapViewController.setViewpointScale(_mapViewController.getCurrentViewpoint(ViewpointType.centerAndScale)!.targetScale * 0.5);
+    await _mapViewController.setViewpointScale(
+      _mapViewController
+              .getCurrentViewpoint(ViewpointType.centerAndScale)!
+              .targetScale *
+          0.5,
+    );
   }
 
   Future<void> _zoomOut() async {
-    await _mapViewController.setViewpointScale(_mapViewController.getCurrentViewpoint(ViewpointType.centerAndScale)!.targetScale * 2.0);
+    await _mapViewController.setViewpointScale(
+      _mapViewController
+              .getCurrentViewpoint(ViewpointType.centerAndScale)!
+              .targetScale *
+          2.0,
+    );
   }
 
   Future<void> _calculateRoute(TransportMode mode) async {
     if (_selectedDestination == null) return;
-    
+
     final success = await _routeService.calculateRoute(
       destination: _selectedDestination!,
       transportMode: mode,
     );
-    
+
     if (success) {
-      setState(() {
-        _showRouteButtons = false;
-      });
-      
-      // Mostrar diálogo con información de la ruta
+      setState(() => _showRouteButtons = false);
       final routeInfo = _routeService.getLastRouteInfo();
-      if (routeInfo != null && mounted) {
-        _showRouteDialog(routeInfo);
-      }
+      if (routeInfo != null && mounted) _showRouteDialog(routeInfo);
     }
   }
 
@@ -110,8 +115,8 @@ class _MapViewState extends State<MapView> with AutomaticKeepAliveClientMixin {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: AppColors.background,
-        title: Text(
-          'Ruta Calculada',
+        title: const Text(
+          'Route Calculated',
           style: TextStyle(color: Colors.white),
         ),
         content: Column(
@@ -119,18 +124,18 @@ class _MapViewState extends State<MapView> with AutomaticKeepAliveClientMixin {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Distancia: ${routeInfo['distance']} km',
-              style: TextStyle(color: Colors.white70),
+              'Distance: ${routeInfo['distance']} km',
+              style: const TextStyle(color: Colors.white70),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
-              'Tiempo estimado: ${routeInfo['time']} min',
-              style: TextStyle(color: Colors.white70),
+              'Estimated time: ${routeInfo['time']} min',
+              style: const TextStyle(color: Colors.white70),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
-              'Modo: ${routeInfo['mode']}',
-              style: TextStyle(color: Colors.white70),
+              'Mode: ${routeInfo['mode']}',
+              style: const TextStyle(color: Colors.white70),
             ),
           ],
         ),
@@ -140,11 +145,11 @@ class _MapViewState extends State<MapView> with AutomaticKeepAliveClientMixin {
               Navigator.pop(context);
               _clearRoute();
             },
-            child: Text('Limpiar Ruta', style: TextStyle(color: AppColors.primary)),
+            child: Text('Clear Route', style: TextStyle(color: AppColors.primary)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Cerrar', style: TextStyle(color: AppColors.primary)),
+            child: Text('Close', style: TextStyle(color: AppColors.primary)),
           ),
         ],
       ),
@@ -175,22 +180,24 @@ class _MapViewState extends State<MapView> with AutomaticKeepAliveClientMixin {
           ArcGISMapView(
             controllerProvider: () => _mapViewController,
             onMapViewReady: () {
-              print('Mapa público listo');
-              if (_mapViewController.arcGISMap == null) {
-                print('Error: Mapa no cargado, verifica la ID del WebMap');
+              if (kDebugMode) {
+                debugPrint('Map view ready');
+                if (_mapViewController.arcGISMap == null) {
+                  debugPrint('Warning: map not loaded — verify WebMap ID');
+                }
               }
             },
             onTap: (screenPoint) => _interactions.handleMapTap(screenPoint),
           ),
-          
-          // Botones de zoom
+
+          // Zoom controls
           Positioned(
             top: 100,
             right: 16,
             child: Column(
               children: [
                 FloatingActionButton(
-                  heroTag: "zoom_in",
+                  heroTag: 'zoom_in',
                   mini: true,
                   backgroundColor: AppColors.primary,
                   onPressed: _zoomIn,
@@ -198,7 +205,7 @@ class _MapViewState extends State<MapView> with AutomaticKeepAliveClientMixin {
                 ),
                 const SizedBox(height: 8),
                 FloatingActionButton(
-                  heroTag: "zoom_out",
+                  heroTag: 'zoom_out',
                   mini: true,
                   backgroundColor: AppColors.primary,
                   onPressed: _zoomOut,
@@ -207,15 +214,15 @@ class _MapViewState extends State<MapView> with AutomaticKeepAliveClientMixin {
               ],
             ),
           ),
-          
-          // Botones de ubicación
+
+          // Location controls
           Positioned(
             bottom: 200,
             right: 16,
             child: Column(
               children: [
                 FloatingActionButton(
-                  heroTag: "location_toggle",
+                  heroTag: 'location_toggle',
                   backgroundColor: _isLocationEnabled ? AppColors.primary : AppColors.grey,
                   onPressed: _toggleLocation,
                   child: Icon(
@@ -225,7 +232,7 @@ class _MapViewState extends State<MapView> with AutomaticKeepAliveClientMixin {
                 ),
                 const SizedBox(height: 8),
                 FloatingActionButton(
-                  heroTag: "center_location",
+                  heroTag: 'center_location',
                   mini: true,
                   backgroundColor: AppColors.primary,
                   onPressed: _centerOnLocation,
@@ -234,8 +241,8 @@ class _MapViewState extends State<MapView> with AutomaticKeepAliveClientMixin {
               ],
             ),
           ),
-          
-          // Botones de ruta (solo se muestran cuando hay destino seleccionado)
+
+          // Route selector (shown only when a destination is selected)
           if (_showRouteButtons)
             Positioned(
               bottom: 80,
@@ -246,13 +253,13 @@ class _MapViewState extends State<MapView> with AutomaticKeepAliveClientMixin {
                 decoration: BoxDecoration(
                   color: AppColors.background.withOpacity(0.9),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.primary, width: 1),
+                  border: Border.all(color: AppColors.primary),
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      'Calcular ruta al destino',
+                    const Text(
+                      'Calculate route to destination',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 16,
@@ -265,46 +272,41 @@ class _MapViewState extends State<MapView> with AutomaticKeepAliveClientMixin {
                       children: [
                         _buildRouteButton(
                           icon: Icons.directions_walk,
-                          label: 'Caminar',
+                          label: 'Walk',
                           onPressed: () => _calculateRoute(TransportMode.walking),
                         ),
                         _buildRouteButton(
                           icon: Icons.directions_car,
-                          label: 'Coche',
+                          label: 'Drive',
                           onPressed: () => _calculateRoute(TransportMode.driving),
                         ),
                         _buildRouteButton(
                           icon: Icons.directions_bike,
-                          label: 'Bici',
+                          label: 'Cycle',
                           onPressed: () => _calculateRoute(TransportMode.cycling),
                         ),
                       ],
                     ),
                     const SizedBox(height: 8),
                     TextButton(
-                      onPressed: () {
-                        setState(() {
-                          _showRouteButtons = false;
-                          _selectedDestination = null;
-                        });
-                      },
-                      child: Text(
-                        'Cancelar',
-                        style: TextStyle(color: AppColors.grey),
-                      ),
+                      onPressed: () => setState(() {
+                        _showRouteButtons = false;
+                        _selectedDestination = null;
+                      }),
+                      child: Text('Cancel', style: TextStyle(color: AppColors.grey)),
                     ),
                   ],
                 ),
               ),
             ),
-          
-          // Botón de limpiar ruta
+
+          // Clear-route button (shown when a route is active)
           if (_routeService.hasActiveRoute)
             Positioned(
               bottom: 140,
               left: 16,
               child: FloatingActionButton(
-                heroTag: "clear_route",
+                heroTag: 'clear_route',
                 mini: true,
                 backgroundColor: Colors.red,
                 onPressed: _clearRoute,
@@ -330,19 +332,14 @@ class _MapViewState extends State<MapView> with AutomaticKeepAliveClientMixin {
             backgroundColor: AppColors.primary,
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(vertical: 12),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(icon, size: 20),
               const SizedBox(height: 4),
-              Text(
-                label,
-                style: const TextStyle(fontSize: 12),
-              ),
+              Text(label, style: const TextStyle(fontSize: 12)),
             ],
           ),
         ),

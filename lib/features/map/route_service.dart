@@ -1,12 +1,14 @@
 import 'package:arcgis_maps/arcgis_maps.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 enum TransportMode {
-  walking('WalkTime', 'Caminando', Icons.directions_walk, Colors.green),
-  driving('TravelTime', 'Conduciendo', Icons.directions_car, Colors.blue),
-  cycling('WalkTime', 'Ciclismo', Icons.directions_bike, Colors.orange);
+  walking('WalkTime', 'Walking', Icons.directions_walk, Colors.green),
+  driving('TravelTime', 'Driving', Icons.directions_car, Colors.blue),
+  cycling('WalkTime', 'Cycling', Icons.directions_bike, Colors.orange);
 
   const TransportMode(this.arcgisValue, this.displayName, this.icon, this.color);
+
   final String arcgisValue;
   final String displayName;
   final IconData icon;
@@ -33,9 +35,9 @@ class RouteService {
       );
       _routeTask = RouteTask.withUri(routeServiceUrl);
       await _routeTask!.load();
-      print('Servicio de rutas inicializado correctamente');
+      debugPrint('Route service initialised successfully');
     } catch (e) {
-      print('Error al inicializar el servicio de rutas: $e');
+      debugPrint('Failed to initialise route service: $e');
     }
   }
 
@@ -44,44 +46,32 @@ class RouteService {
     required TransportMode transportMode,
   }) async {
     if (_routeTask == null) {
-      print('Servicio de rutas no inicializado');
+      debugPrint('Route service not initialised');
       return false;
     }
 
     try {
-      // Obtener ubicación actual
       final currentLocation = _mapViewController.locationDisplay.location;
       if (currentLocation == null) {
-        print('No se pudo obtener la ubicación actual');
+        debugPrint('Could not retrieve current location');
         return false;
       }
 
-      // Crear punto de origen
       final origin = ArcGISPoint(
         x: currentLocation.position.x,
         y: currentLocation.position.y,
         spatialReference: SpatialReference.wgs84,
       );
 
-      // Crear parámetros de ruta
       final routeParameters = await _routeTask!.createDefaultParameters();
-      
-      // Configurar paradas
-      final stops = [
-        Stop(origin),
-        Stop(destination),
-      ];
-      routeParameters.setStops(stops);
-
-      // Configurar parámetros
+      routeParameters.setStops([Stop(origin), Stop(destination)]);
       routeParameters.returnDirections = true;
       routeParameters.returnRoutes = true;
       routeParameters.returnStops = true;
       routeParameters.directionsDistanceUnits = UnitSystem.metric;
 
-      // Resolver la ruta
       final routeResult = await _routeTask!.solveRoute(routeParameters);
-      
+
       if (routeResult.routes.isNotEmpty) {
         final route = routeResult.routes.first;
         await _displayRoute(route, transportMode);
@@ -89,112 +79,82 @@ class RouteService {
         _hasActiveRoute = true;
         return true;
       } else {
-        print('No se pudo calcular la ruta');
+        debugPrint('No route could be calculated');
         return false;
       }
     } catch (e) {
-      print('Error al calcular la ruta: $e');
+      debugPrint('Failed to calculate route: $e');
       return false;
     }
   }
 
   Future<void> _displayRoute(ArcGISRoute route, TransportMode transportMode) async {
     try {
-      // Limpiar rutas anteriores
       _routeOverlay.graphics.clear();
 
-      // Crear símbolo para la ruta
       final routeSymbol = SimpleLineSymbol(
         style: SimpleLineSymbolStyle.solid,
         color: transportMode.color,
         width: 5,
       );
 
-      // Crear gráfico de la ruta
       final routeGeometry = route.routeGeometry;
       if (routeGeometry != null) {
-        final routeGraphic = Graphic(
-          geometry: routeGeometry,
-          symbol: routeSymbol,
+        _routeOverlay.graphics.add(
+          Graphic(geometry: routeGeometry, symbol: routeSymbol),
         );
-        _routeOverlay.graphics.add(routeGraphic);
       }
 
-      // Añadir marcadores de inicio y fin
       await _addRouteMarkers(route);
 
-      // Ajustar vista para mostrar toda la ruta - CORREGIDO
       if (routeGeometry != null) {
-        // Crear el viewpoint usando el método correcto 'fromTargetExtent'
-        final viewpoint = Viewpoint.fromTargetExtent(routeGeometry);
-
-        // Usar setViewpoint (retorna void) - CORREGIDO
-        _mapViewController.setViewpoint(viewpoint);
+        _mapViewController.setViewpoint(Viewpoint.fromTargetExtent(routeGeometry));
       }
     } catch (e) {
-      print('Error al mostrar la ruta: $e');
+      debugPrint('Failed to display route: $e');
     }
   }
 
   Future<void> _addRouteMarkers(ArcGISRoute route) async {
     try {
-      // Marcador de inicio (verde)
       final startSymbol = SimpleMarkerSymbol(
         style: SimpleMarkerSymbolStyle.circle,
         color: Colors.green,
         size: 12,
       );
-
-      // Marcador de fin (rojo)
       final endSymbol = SimpleMarkerSymbol(
         style: SimpleMarkerSymbolStyle.circle,
         color: Colors.red,
         size: 12,
       );
 
-      // Obtener puntos de inicio y fin de la geometría de la ruta
       final routeGeometry = route.routeGeometry;
       if (routeGeometry is Polyline) {
-        final polyline = routeGeometry;
-        final part = polyline.parts.first;
-        final points = part.getPoints();
-        
+        final points = routeGeometry.parts.first.getPoints();
         if (points.isNotEmpty) {
-          final startPoint = points.first;
-          final endPoint = points.last;
-
-          // Añadir marcadores
-          _routeOverlay.graphics.add(
-            Graphic(geometry: startPoint, symbol: startSymbol),
-          );
-          _routeOverlay.graphics.add(
-            Graphic(geometry: endPoint, symbol: endSymbol),
-          );
+          _routeOverlay.graphics
+            ..add(Graphic(geometry: points.first, symbol: startSymbol))
+            ..add(Graphic(geometry: points.last, symbol: endSymbol));
         }
       }
     } catch (e) {
-      print('Error al añadir marcadores de ruta: $e');
+      debugPrint('Failed to add route markers: $e');
     }
   }
 
   void _storeRouteInfo(ArcGISRoute route, TransportMode transportMode) {
     try {
-      // Obtener distancia en kilómetros
-      double distanceKm = route.totalLength; // totalLength ya está en kilómetros (UnitSystem.metric)
-
-      // Obtener tiempo en minutos
-      double timeMinutes = route.travelTime; // travelTime ya está en minutos
-
       _lastRouteInfo = {
-        'distance': distanceKm.toStringAsFixed(2),
-        'time': timeMinutes.toStringAsFixed(0),
+        'distance': route.totalLength.toStringAsFixed(2),
+        'time': route.travelTime.toStringAsFixed(0),
         'mode': transportMode.displayName,
-        'directions': route.directionManeuvers.map((maneuver) => maneuver.directionText).toList(),
+        'directions': route.directionManeuvers
+            .map((m) => m.directionText)
+            .toList(),
       };
-
-      print('Información de ruta almacenada: $_lastRouteInfo');
+      debugPrint('Route info stored: $_lastRouteInfo');
     } catch (e) {
-      print('Error al almacenar información de ruta: $e');
+      debugPrint('Failed to store route info: $e');
     }
   }
 
@@ -208,9 +168,7 @@ class RouteService {
   bool get hasActiveRoute => _hasActiveRoute;
 
   List<String> getDirections() {
-    if (_lastRouteInfo != null && _lastRouteInfo!['directions'] != null) {
-      return List<String>.from(_lastRouteInfo!['directions']);
-    }
-    return [];
+    final directions = _lastRouteInfo?['directions'];
+    return directions != null ? List<String>.from(directions) : [];
   }
 }

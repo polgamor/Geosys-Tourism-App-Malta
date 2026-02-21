@@ -10,7 +10,6 @@ class OnboardingViewModel extends ChangeNotifier {
   final PageController pageController = PageController();
   int _currentPage = 0;
   int get currentPage => _currentPage;
-  // Aumentamos el número total de páginas
   final int totalPages = 6;
 
   OnboardingState _state = OnboardingState.loading;
@@ -22,7 +21,6 @@ class OnboardingViewModel extends ChangeNotifier {
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
-  // Controladores existentes
   final nameController = TextEditingController();
   final surnameController = TextEditingController();
   final ageController = TextEditingController();
@@ -32,31 +30,28 @@ class OnboardingViewModel extends ChangeNotifier {
 
   String? _selectedGender;
   String? get selectedGender => _selectedGender;
-  final List<String> availableGenders = ['Male', 'Female', 'Other'];
+  final List<String> availableGenders = const ['Male', 'Female', 'Other'];
 
   final Set<String> _selectedPreferences = {};
   Set<String> get selectedPreferences => Set.unmodifiable(_selectedPreferences);
 
   final List<String> availablePreferences = const [
     'Beaches', 'Parties', 'Restaurants', 'Culture', 'History',
-    'Adventure', 'Relax', 'Shopping', 'Nature', 'Sports'
+    'Adventure', 'Relax', 'Shopping', 'Nature', 'Sports',
   ];
-  
-  // --- NUEVOS CAMPOS ---
+
   String? _selectedTravelStyle;
   String? get selectedTravelStyle => _selectedTravelStyle;
-  final List<String> availableTravelStyles = ['Solo', 'Couple', 'Family', 'Friends'];
+  final List<String> availableTravelStyles = const ['Solo', 'Couple', 'Family', 'Friends'];
 
   String? _selectedBudgetTier;
   String? get selectedBudgetTier => _selectedBudgetTier;
-  final List<String> availableBudgetTiers = ['Budget', 'Mid-range', 'Luxury'];
+  final List<String> availableBudgetTiers = const ['Budget', 'Mid-range', 'Luxury'];
 
   DateTime? _tripStartDate;
   DateTime? get tripStartDate => _tripStartDate;
   DateTime? _tripEndDate;
   DateTime? get tripEndDate => _tripEndDate;
-  // --- FIN DE NUEVOS CAMPOS ---
-
 
   OnboardingViewModel() {
     pageController.addListener(() {
@@ -80,9 +75,7 @@ class OnboardingViewModel extends ChangeNotifier {
 
       if (nameController.text.isNotEmpty && surnameController.text.isNotEmpty) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (pageController.hasClients) {
-            pageController.jumpToPage(1);
-          }
+          if (pageController.hasClients) pageController.jumpToPage(1);
         });
       }
     }
@@ -90,7 +83,6 @@ class OnboardingViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // --- MÉTODOS PARA LOS NUEVOS DATOS ---
   void selectTravelStyle(String style) {
     _selectedTravelStyle = style;
     notifyListeners();
@@ -106,7 +98,6 @@ class OnboardingViewModel extends ChangeNotifier {
     _tripEndDate = end;
     notifyListeners();
   }
-  // --- FIN DE MÉTODOS PARA NUEVOS DATOS ---
 
   void selectCountry(Country country) {
     _selectedCountry = country;
@@ -127,33 +118,27 @@ class OnboardingViewModel extends ChangeNotifier {
 
   void nextPage() {
     _errorMessage = null;
-    // Validaciones para cada página
     switch (_currentPage) {
       case 0:
         if (nameController.text.trim().isEmpty || surnameController.text.trim().isEmpty) {
-          _errorMessage = "Name and surname cannot be empty.";
+          _errorMessage = 'Name and surname cannot be empty.';
         }
-        break;
       case 1:
         if (_selectedCountry == null) {
-          _errorMessage = "Please select your country.";
+          _errorMessage = 'Please select your country.';
         }
-        break;
       case 2:
         if (_selectedGender == null || ageController.text.trim().isEmpty) {
-          _errorMessage = "Please provide your gender and age.";
+          _errorMessage = 'Please provide your gender and age.';
         }
-        break;
-      case 3: // Nueva página de estilo de viaje y presupuesto
+      case 3:
         if (_selectedTravelStyle == null || _selectedBudgetTier == null) {
-          _errorMessage = "Please select your travel style and budget.";
+          _errorMessage = 'Please select your travel style and budget.';
         }
-        break;
-      case 4: // Nueva página de fechas
+      case 4:
         if (_tripStartDate == null || _tripEndDate == null) {
-          _errorMessage = "Please select your trip dates.";
+          _errorMessage = 'Please select your trip dates.';
         }
-        break;
     }
 
     if (_errorMessage != null) {
@@ -181,9 +166,9 @@ class OnboardingViewModel extends ChangeNotifier {
 
   Future<bool> finishOnboarding() async {
     if (_selectedPreferences.isEmpty) {
-        _errorMessage = "Please select at least one interest.";
-        notifyListeners();
-        return false;
+      _errorMessage = 'Please select at least one interest.';
+      notifyListeners();
+      return false;
     }
 
     _setLoading(true);
@@ -197,7 +182,6 @@ class OnboardingViewModel extends ChangeNotifier {
         'gender': _selectedGender,
         'age': int.tryParse(ageController.text.trim()),
         'preferences': _selectedPreferences.toList(),
-        // Añadimos los nuevos datos al mapa que se envía a Supabase
         'travel_style': _selectedTravelStyle,
         'budget_tier': _selectedBudgetTier,
         'trip_start_date': _tripStartDate?.toIso8601String(),
@@ -207,9 +191,8 @@ class OnboardingViewModel extends ChangeNotifier {
       await _authService.completeOnboarding(profileData);
       _setLoading(false);
       return true;
-
     } catch (e) {
-      _errorMessage = "An error occurred. Please try again.";
+      _errorMessage = 'An error occurred. Please try again.';
       _setLoading(false);
       return false;
     }

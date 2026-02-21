@@ -8,13 +8,13 @@ class ItinerariesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Itinerarios'),
+        title: const Text('Itineraries'),
         backgroundColor: AppColors.background,
         elevation: 0,
       ),
       body: const Center(
         child: Text(
-          'Aquí se mostrarán los itinerarios.',
+          'Your itineraries will be displayed here.',
           style: TextStyle(color: Colors.white),
         ),
       ),

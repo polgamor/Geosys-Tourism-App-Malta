@@ -8,13 +8,13 @@ class EventsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Eventos'),
+        title: const Text('Events'),
         backgroundColor: AppColors.background,
         elevation: 0,
       ),
       body: const Center(
         child: Text(
-          'Aquí se mostrarán los eventos.',
+          'Events will be displayed here.',
           style: TextStyle(color: Colors.white),
         ),
       ),

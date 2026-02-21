@@ -8,13 +8,13 @@ class FavoritePlacesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sitios Favoritos'),
+        title: const Text('Favourite Places'),
         backgroundColor: AppColors.background,
         elevation: 0,
       ),
       body: const Center(
         child: Text(
-          'Aquí se mostrarán tus sitios favoritos.',
+          'Your favourite places will be displayed here.',
           style: TextStyle(color: Colors.white),
         ),
       ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../viewmodel/new_password_viewmodel.dart'; 
+import '../viewmodel/new_password_viewmodel.dart';
 
 class NewPasswordScreen extends StatelessWidget {
   const NewPasswordScreen({super.key});
@@ -55,7 +55,9 @@ class NewPasswordScreen extends StatelessWidget {
                           ),
                         const SizedBox(height: 10),
                         viewModel.isLoading
-                            ? const Center(child: CircularProgressIndicator(color: Colors.white))
+                            ? const Center(
+                                child: CircularProgressIndicator(color: Colors.white),
+                              )
                             : _buildAuthButton(
                                 text: 'Save Password',
                                 onPressed: () async {
@@ -76,11 +78,9 @@ class NewPasswordScreen extends StatelessWidget {
     );
   }
 
-  // COMENTARIO:
-  // Widgets de UI extraídos para mantener la consistencia con LoginScreen.
   Widget _buildHeader() {
     return const Text(
-      "Create New Password",
+      'Create New Password',
       textAlign: TextAlign.center,
       style: TextStyle(
         color: Colors.white,
@@ -124,7 +124,10 @@ class NewPasswordScreen extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 10),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
-        child: Text(text, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+        child: Text(
+          text,
+          style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
+        ),
       ),
     );
   }

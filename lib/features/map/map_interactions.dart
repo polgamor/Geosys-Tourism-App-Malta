@@ -1,4 +1,5 @@
 import 'package:arcgis_maps/arcgis_maps.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../../colors.dart';
 
@@ -10,122 +11,94 @@ class MapInteractions {
   ArcGISPoint? _selectedDestination;
 
   void setupMapInteractions(
-    ArcGISMapViewController controller, 
+    ArcGISMapViewController controller,
     BuildContext context,
     Function(ArcGISPoint)? onDestinationSelected,
   ) {
     _mapViewController = controller;
     _context = context;
     _onDestinationSelected = onDestinationSelected;
-    
-    // Añadir overlay para mostrar destinos seleccionados
     _mapViewController.graphicsOverlays.add(_destinationOverlay);
   }
 
   Future<void> handleMapTap(Offset screenPoint) async {
     try {
-      // Primero intentar identificar elementos existentes en el mapa
       final identifyResults = await _mapViewController.identifyLayers(
         screenPoint: screenPoint,
         tolerance: 10.0,
       );
-      
+
       if (identifyResults.isNotEmpty) {
         final result = identifyResults.first;
         final geoElements = result.geoElements;
-        
+
         if (geoElements.isNotEmpty) {
           final feature = geoElements.first;
           if (feature is ArcGISFeature) {
             final attributes = feature.attributes;
-            if (attributes.isNotEmpty) {
-              _showFeaturePopup(attributes);
-            }
-            
-            // Si el feature tiene geometría, usarla como destino
+            if (attributes.isNotEmpty) _showFeaturePopup(attributes);
+
             if (feature.geometry is ArcGISPoint) {
               _setDestination(feature.geometry as ArcGISPoint);
             }
           }
         }
       } else {
-        // Si no hay elementos identificados, usar el punto tocado como destino
         final mapPoint = _mapViewController.screenToLocation(screen: screenPoint);
-        if (mapPoint != null) {
-          _setDestination(mapPoint);
-        }
+        if (mapPoint != null) _setDestination(mapPoint);
       }
     } catch (e) {
-      print('Error al identificar elementos: $e');
+      debugPrint('Error identifying map features: $e');
     }
   }
 
   void _setDestination(ArcGISPoint destination) {
     _selectedDestination = destination;
-    
-    // Limpiar destinos anteriores
     _destinationOverlay.graphics.clear();
-    
-    // Crear un marcador para el destino
+
     final destinationSymbol = SimpleMarkerSymbol(
       style: SimpleMarkerSymbolStyle.diamond,
       color: Colors.red,
       size: 16,
     );
-    
-    final destinationGraphic = Graphic(
-      geometry: destination,
-      symbol: destinationSymbol,
+
+    _destinationOverlay.graphics.add(
+      Graphic(geometry: destination, symbol: destinationSymbol),
     );
-    
-    _destinationOverlay.graphics.add(destinationGraphic);
-    
-    // Notificar al widget padre que se ha seleccionado un destino
+
     _onDestinationSelected?.call(destination);
-    
-    // Mostrar popup de confirmación
     _showDestinationPopup(destination);
   }
 
   void _showFeaturePopup(Map<String, dynamic> attributes) {
-    // Filtrar atributos relevantes
     final relevantAttributes = <String, dynamic>{};
-    
+
     for (final entry in attributes.entries) {
-      if (entry.value != null && 
-          entry.value.toString().isNotEmpty && 
+      if (entry.value != null &&
+          entry.value.toString().isNotEmpty &&
           entry.value.toString() != 'null') {
-        
-        // Formatear nombres de campos comunes
-        String fieldName = entry.key;
+        String fieldLabel = entry.key;
         switch (entry.key.toLowerCase()) {
           case 'name':
           case 'nombre':
-            fieldName = 'Nombre';
-            break;
+            fieldLabel = 'Name';
           case 'description':
           case 'descripcion':
-            fieldName = 'Descripción';
-            break;
+            fieldLabel = 'Description';
           case 'type':
           case 'tipo':
-            fieldName = 'Tipo';
-            break;
+            fieldLabel = 'Type';
           case 'address':
           case 'direccion':
-            fieldName = 'Dirección';
-            break;
+            fieldLabel = 'Address';
           case 'phone':
           case 'telefono':
-            fieldName = 'Teléfono';
-            break;
+            fieldLabel = 'Phone';
           case 'website':
           case 'web':
-            fieldName = 'Sitio web';
-            break;
+            fieldLabel = 'Website';
         }
-        
-        relevantAttributes[fieldName] = entry.value;
+        relevantAttributes[fieldLabel] = entry.value;
       }
     }
 
@@ -134,8 +107,8 @@ class MapInteractions {
         context: _context,
         builder: (context) => AlertDialog(
           backgroundColor: AppColors.background,
-          title: Text(
-            'Información del Lugar',
+          title: const Text(
+            'Place Information',
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           ),
           content: SingleChildScrollView(
@@ -150,7 +123,7 @@ class MapInteractions {
                       children: [
                         TextSpan(
                           text: '${entry.key}: ',
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: AppColors.primary,
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
@@ -158,10 +131,7 @@ class MapInteractions {
                         ),
                         TextSpan(
                           text: entry.value.toString(),
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontSize: 14,
-                          ),
+                          style: const TextStyle(color: Colors.white70, fontSize: 14),
                         ),
                       ],
                     ),
@@ -173,7 +143,7 @@ class MapInteractions {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('Cerrar', style: TextStyle(color: AppColors.primary)),
+              child: const Text('Close', style: TextStyle(color: AppColors.primary)),
             ),
           ],
         ),
@@ -186,30 +156,30 @@ class MapInteractions {
       context: _context,
       builder: (context) => AlertDialog(
         backgroundColor: AppColors.background,
-        title: Text(
-          'Destino Seleccionado',
+        title: const Text(
+          'Destination Selected',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Coordenadas:',
+            const Text(
+              'Coordinates:',
               style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 4),
+            const SizedBox(height: 4),
             Text(
-              'Latitud: ${destination.y.toStringAsFixed(6)}',
-              style: TextStyle(color: Colors.white70),
+              'Latitude: ${destination.y.toStringAsFixed(6)}',
+              style: const TextStyle(color: Colors.white70),
             ),
             Text(
-              'Longitud: ${destination.x.toStringAsFixed(6)}',
-              style: TextStyle(color: Colors.white70),
+              'Longitude: ${destination.x.toStringAsFixed(6)}',
+              style: const TextStyle(color: Colors.white70),
             ),
-            SizedBox(height: 12),
-            Text(
-              '¿Deseas calcular una ruta a este destino?',
+            const SizedBox(height: 12),
+            const Text(
+              'Would you like to calculate a route to this destination?',
               style: TextStyle(color: Colors.white),
             ),
           ],
@@ -220,11 +190,11 @@ class MapInteractions {
               Navigator.pop(context);
               clearDestination();
             },
-            child: Text('Cancelar', style: TextStyle(color: AppColors.grey)),
+            child: Text('Cancel', style: TextStyle(color: AppColors.grey)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Sí', style: TextStyle(color: AppColors.primary)),
+            child: const Text('Yes', style: TextStyle(color: AppColors.primary)),
           ),
         ],
       ),

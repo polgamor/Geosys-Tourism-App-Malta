@@ -1,4 +1,5 @@
 import 'package:arcgis_maps/arcgis_maps.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class MapConfig {
@@ -6,13 +7,28 @@ class MapConfig {
   static const double maltaLatitude = 35.9375;
   static const double maltaLongitude = 14.3755;
   static const double initialScale = 500000;
-  
+
   static const double minScale = 1000;
   static const double maxScale = 10000000;
-  
+
   static const double locationZoomScale = 10000;
   static const double navigationZoomScale = 5000;
   static const double routeZoomScale = 25000;
+
+  static const String routeServiceUrl =
+      'https://route-api.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World';
+
+  static const Map<String, double> zoomLevels = {
+    'world': 50000000,
+    'country': 10000000,
+    'region': 5000000,
+    'city': 500000,
+    'district': 100000,
+    'neighborhood': 25000,
+    'street': 10000,
+    'building': 5000,
+    'detail': 1000,
+  };
 
   static Future<ArcGISMap> createConfiguredMap() async {
     try {
@@ -26,23 +42,17 @@ class MapConfig {
       await _configureMapSettings(map);
       return map;
     } catch (e) {
-      print('Error al crear mapa configurado: $e');
+      debugPrint('Failed to create configured map: $e');
       return _createFallbackMap();
     }
   }
 
   static Future<void> _configureMapSettings(ArcGISMap map) async {
     try {
-      // Configurar límites de escala si es necesario
-      // map.minScale = minScale;
-      // map.maxScale = maxScale;
-      
-      // Configurar opciones de referencia
       map.referenceScale = 0;
-      
-      print('Configuraciones del mapa aplicadas');
+      debugPrint('Map settings applied');
     } catch (e) {
-      print('Error aplicando configuraciones: $e');
+      debugPrint('Error applying map settings: $e');
     }
   }
 
@@ -148,87 +158,53 @@ class MapConfig {
     );
   }
 
-  static const String routeServiceUrl = 
-      'https://route-api.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World';
-
   static Map<String, Map<String, dynamic>> getTransportConfigurations() {
     return {
       'walking': {
-        'displayName': 'Caminando',
+        'displayName': 'Walking',
         'icon': Icons.directions_walk,
         'color': Colors.green,
         'speedKmh': 5.0,
         'impedanceAttribute': 'WalkTime',
       },
       'driving': {
-        'displayName': 'Conduciendo',
+        'displayName': 'Driving',
         'icon': Icons.directions_car,
         'color': Colors.blue,
         'speedKmh': 50.0,
         'impedanceAttribute': 'TravelTime',
       },
       'cycling': {
-        'displayName': 'Ciclismo',
+        'displayName': 'Cycling',
         'icon': Icons.directions_bike,
         'color': Colors.orange,
         'speedKmh': 15.0,
-        'impedanceAttribute': 'WalkTime', // Usar WalkTime para ciclismo
+        'impedanceAttribute': 'WalkTime',
       },
     };
   }
 
   static LocationDisplayAutoPanMode getAutoPanMode(String mode) {
-    switch (mode.toLowerCase()) {
-      case 'navigation':
-        return LocationDisplayAutoPanMode.navigation;
-      case 'recenter':
-        return LocationDisplayAutoPanMode.recenter;
-      case 'compassnavigation':
-        return LocationDisplayAutoPanMode.compassNavigation;
-      default:
-        return LocationDisplayAutoPanMode.off;
-    }
-  }
-
-  static const Map<String, double> zoomLevels = {
-    'world': 50000000,
-    'country': 10000000,
-    'region': 5000000,
-    'city': 500000,
-    'district': 100000,
-    'neighborhood': 25000,
-    'street': 10000,
-    'building': 5000,
-    'detail': 1000,
-  };
-
-  static double getZoomLevel(String level) {
-    return zoomLevels[level.toLowerCase()] ?? initialScale;
-  }
-
-  // Configuración para diferentes tipos de capas
-  static Map<String, dynamic> getLayerConfigurations() {
-    return {
-      'traffic': {
-        'visible': true,
-        'opacity': 0.8,
-      },
-      'transit': {
-        'visible': false,
-        'opacity': 0.7,
-      },
-      'poi': {
-        'visible': true,
-        'opacity': 1.0,
-      },
-      'terrain': {
-        'visible': false,
-        'opacity': 0.6,
-      },
+    return switch (mode.toLowerCase()) {
+      'navigation' => LocationDisplayAutoPanMode.navigation,
+      'recenter' => LocationDisplayAutoPanMode.recenter,
+      'compassnavigation' => LocationDisplayAutoPanMode.compassNavigation,
+      _ => LocationDisplayAutoPanMode.off,
     };
   }
 
-  // Configuración para gestos del mapa
+  static double getZoomLevel(String level) =>
+      zoomLevels[level.toLowerCase()] ?? initialScale;
+
+  static Map<String, dynamic> getLayerConfigurations() {
+    return {
+      'traffic': {'visible': true, 'opacity': 0.8},
+      'transit': {'visible': false, 'opacity': 0.7},
+      'poi': {'visible': true, 'opacity': 1.0},
+      'terrain': {'visible': false, 'opacity': 0.6},
+    };
+  }
+
   static Map<String, bool> getGestureConfigurations() {
     return {
       'pan': true,

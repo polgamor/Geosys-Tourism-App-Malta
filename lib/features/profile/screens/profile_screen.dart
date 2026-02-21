@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import 'edit_profile_screen.dart';
 import '../viewmodel/profile_viewmodel.dart';
 import '../../login/screens/login_screen.dart';
-import '../../widgets/language_picker_widget.dart'; 
+import '../../widgets/language_picker_widget.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -48,7 +48,6 @@ class _ProfileContentView extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
-          // Añadimos el selector de idioma aquí para consistencia
           const LanguagePickerWidget(),
           IconButton(
             icon: const Icon(Icons.logout, color: Colors.white70),
@@ -72,14 +71,16 @@ class _ProfileContentView extends StatelessWidget {
           }
 
           if (viewModel.profileData == null) {
-            return const Center(child: Text('Could not load profile.', style: TextStyle(color: Colors.white70)));
+            return const Center(
+              child: Text('Could not load profile.', style: TextStyle(color: Colors.white70)),
+            );
           }
 
           final profile = viewModel.profileData!;
           final age = profile['age']?.toString() ?? '';
           final name = profile['name'] ?? 'No Name';
           final title = age.isNotEmpty ? '$name, $age' : name;
-          
+
           return RefreshIndicator(
             onRefresh: viewModel.loadProfile,
             color: Colors.white,
@@ -92,37 +93,55 @@ class _ProfileContentView extends StatelessWidget {
                   const SizedBox(height: 20),
                   _buildAvatar(profile['avatar_url']),
                   const SizedBox(height: 16),
-                  Text(title, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white)),
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
                   const SizedBox(height: 8),
-                  Text('@${profile['username']}', style: const TextStyle(fontSize: 16, color: Colors.white70)),
+                  Text(
+                    '@${profile['username']}',
+                    style: const TextStyle(fontSize: 16, color: Colors.white70),
+                  ),
                   const SizedBox(height: 24),
                   _buildEditProfileButton(context, viewModel),
                   const SizedBox(height: 32),
-                  
-                  // Tarjeta "About Me"
                   _InfoCard(
                     title: 'About Me',
                     children: [
-                      _InfoRow(icon: Icons.public_outlined, text: profile['country'] ?? 'Not provided'),
-                      _InfoRow(icon: Icons.wc_outlined, text: profile['gender'] ?? 'Not provided'),
+                      _InfoRow(
+                        icon: Icons.public_outlined,
+                        text: profile['country'] ?? 'Not provided',
+                      ),
+                      _InfoRow(
+                        icon: Icons.wc_outlined,
+                        text: profile['gender'] ?? 'Not provided',
+                      ),
                     ],
                   ),
                   const SizedBox(height: 24),
-
-                  // Tarjeta "My Trip"
                   _InfoCard(
                     title: 'My Trip',
                     children: [
-                      _InfoRow(icon: Icons.date_range_outlined, text: _formatTripDates(profile)),
-                      _InfoRow(icon: Icons.card_travel_outlined, text: profile['travel_style'] ?? 'Not provided'),
-                      _InfoRow(icon: Icons.wallet_outlined, text: profile['budget_tier'] ?? 'Not provided'),
+                      _InfoRow(
+                        icon: Icons.date_range_outlined,
+                        text: _formatTripDates(profile),
+                      ),
+                      _InfoRow(
+                        icon: Icons.card_travel_outlined,
+                        text: profile['travel_style'] ?? 'Not provided',
+                      ),
+                      _InfoRow(
+                        icon: Icons.wallet_outlined,
+                        text: profile['budget_tier'] ?? 'Not provided',
+                      ),
                     ],
                   ),
                   const SizedBox(height: 24),
-                  
-                  // Tarjeta "Interests"
                   _buildInterestsCard(profile['preferences']),
-                  
                   const SizedBox(height: 40),
                 ],
               ),
@@ -154,8 +173,12 @@ class _ProfileContentView extends StatelessWidget {
       child: CircleAvatar(
         radius: 60,
         backgroundColor: Colors.black.withOpacity(0.5),
-        backgroundImage: (avatarUrl != null && avatarUrl.isNotEmpty) ? CachedNetworkImageProvider(avatarUrl) : null,
-        child: (avatarUrl == null || avatarUrl.isEmpty) ? const Icon(Icons.person, size: 60, color: Colors.white70) : null,
+        backgroundImage: (avatarUrl != null && avatarUrl.isNotEmpty)
+            ? CachedNetworkImageProvider(avatarUrl)
+            : null,
+        child: (avatarUrl == null || avatarUrl.isEmpty)
+            ? const Icon(Icons.person, size: 60, color: Colors.white70)
+            : null,
       ),
     );
   }
@@ -185,9 +208,11 @@ class _ProfileContentView extends StatelessWidget {
   }
 
   Widget _buildInterestsCard(dynamic preferencesData) {
-    if (preferencesData == null || (preferencesData as List).isEmpty) return const SizedBox.shrink();
-    final preferences = (preferencesData).map((p) => p.toString()).toList();
-    
+    if (preferencesData == null || (preferencesData as List).isEmpty) {
+      return const SizedBox.shrink();
+    }
+    final preferences = preferencesData.map((p) => p.toString()).toList();
+
     return _InfoCard(
       title: 'Interests',
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -196,30 +221,48 @@ class _ProfileContentView extends StatelessWidget {
           spacing: 10.0,
           runSpacing: 10.0,
           alignment: WrapAlignment.center,
-          children: preferences.map((p) => Chip(
-            label: Text(p, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-            backgroundColor: const Color.fromARGB(255, 29, 168, 64).withOpacity(0.8),
-            side: BorderSide.none,
-          )).toList(),
+          children: preferences
+              .map(
+                (p) => Chip(
+                  label: Text(
+                    p,
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                  backgroundColor: const Color.fromARGB(255, 29, 168, 64).withOpacity(0.8),
+                  side: BorderSide.none,
+                ),
+              )
+              .toList(),
         ),
       ],
     );
   }
 }
 
-// Helper Widgets Reutilizables
 class _InfoCard extends StatelessWidget {
   final String title;
   final List<Widget> children;
   final CrossAxisAlignment? crossAxisAlignment;
-  const _InfoCard({required this.title, required this.children, this.crossAxisAlignment});
+
+  const _InfoCard({
+    required this.title,
+    required this.children,
+    this.crossAxisAlignment,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: crossAxisAlignment ?? CrossAxisAlignment.start,
       children: [
-        Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
         const SizedBox(height: 12),
         Container(
           width: double.infinity,
@@ -239,6 +282,7 @@ class _InfoCard extends StatelessWidget {
 class _InfoRow extends StatelessWidget {
   final IconData icon;
   final String text;
+
   const _InfoRow({required this.icon, required this.text});
 
   @override
@@ -249,7 +293,9 @@ class _InfoRow extends StatelessWidget {
         children: [
           Icon(icon, color: Colors.white70, size: 20),
           const SizedBox(width: 16),
-          Expanded(child: Text(text, style: const TextStyle(fontSize: 16, color: Colors.white))),
+          Expanded(
+            child: Text(text, style: const TextStyle(fontSize: 16, color: Colors.white)),
+          ),
         ],
       ),
     );
