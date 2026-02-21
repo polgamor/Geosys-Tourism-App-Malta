@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "910274859512",
+    "project_id": "maltagoverification",
+    "storage_bucket": "maltagoverification.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:910274859512:android:0e62d82b4f55572972060d",
+        "android_client_info": {
+          "package_name": "com.example.geosys_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCRhadz81lFkvE7mBi3s2pNlXcfhFocFA4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

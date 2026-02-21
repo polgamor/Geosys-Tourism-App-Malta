@@ -1,0 +1,43 @@
+name: geosys_app
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.7.2
+
+dependencies:
+  arcgis_maps: ^200.7.0+4560
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  flutter_dotenv: ^5.2.1
+  supabase_flutter: ^2.9.1
+  webview_flutter: ^4.2.2
+  google_sign_in: ^6.3.0
+  flutter_secure_storage: ^9.2.4
+  permission_handler: ^12.0.0+1
+  flutter_facebook_auth: ^7.1.2
+  provider: ^6.0.0
+  country_picker: ^2.0.20
+  image_picker: ^1.1.2
+  cached_network_image: ^3.2.0 
+  url_launcher: ^6.2.6
+  google_fonts: ^6.2.1
+  intl: ^0.20.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  generate: true
+  uses-material-design: true
+  assets:
+    - assets/images/MaltaGO_icon.png
+    - assets/images/MaltaGO_icon_no_bg.png
+    - assets/images/MaltaGo_logo_Trazado.png
+    - assets/images/login_background.jpg
+    - .env
