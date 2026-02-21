@@ -234,5 +234,3 @@ This project was developed as part of an **Erasmus+ programme** collaborative in
 5. Open a Pull Request
 
 ---
-
-*Built with Flutter & Supabase — Erasmus+ Smart Tourism Initiative*
